@@ -27,8 +27,15 @@ from distributed import (
     reduce_sum,
     get_world_size,
 )
-from op import conv2d_gradfix
-from non_leaking import augment, AdaptiveAugment
+
+if 'COLAB_TPU_ADDR' in os.environ:
+    import torch_xla
+    import torch_xla.core.xla_model as xm
+    import torch_xla.distributed.parallel_loader as pl
+    import torch_xla.distributed.xla_multiprocessing as xmp
+else:
+    from op import conv2d_gradfix
+    from non_leaking import augment, AdaptiveAugment
 
 
 def data_sampler(dataset, shuffle, distributed):
@@ -330,8 +337,6 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
 
 
 if __name__ == "__main__":
-    device = "cuda"
-
     parser = argparse.ArgumentParser(description="StyleGAN2 trainer")
 
     parser.add_argument("path", type=str, help="path to the lmdb dataset")
@@ -429,6 +434,8 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    device = "cuda"
 
     n_gpu = int(os.environ["WORLD_SIZE"]) if "WORLD_SIZE" in os.environ else 1
     args.distributed = n_gpu > 1
