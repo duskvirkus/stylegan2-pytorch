@@ -131,3 +131,12 @@ dmypy.json
 wandb/
 *.lmdb/
 *.pkl
+
+# cloudflared files
+cloudflared
+cloudflared-stable-linux-amd64.tgz
+cloudflared.log
+
+# dev files
+notebooks/results
+notebooks/datasets
